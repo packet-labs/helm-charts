@@ -21,3 +21,15 @@ stringData:
      "projectID": "your-project-id"
     }
 ```
+
+## Charts
+
+The following charts are available:
+
+### csi-packet
+
+This configures the [Container Storage Interface implementation for Packet](https://github.com/packethost/csi-packet). To install run:
+
+```
+helm install --debug ./csi-packet
+```
