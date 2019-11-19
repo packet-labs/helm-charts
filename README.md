@@ -45,3 +45,26 @@ stringData:
 ```
 
 before running `helm install`.
+
+### packet-ccm
+
+This configures the [Cloud Controller Manager implementation for Packet](https://github.com/packethost/ccm-packet). To install run:
+
+```
+helm install --debug ./packet-ccm
+```
+
+This chart requires a `Secret` like the following:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: packet-cloud-config
+  namespace: kube-system
+stringData:
+  apiKey: "your-api-key"
+  projectID: "your-project-id"
+```
+
+before running `helm install`.
