@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-ccmPacketRelease: "v0.0.4"
+ccmPacketRelease: "v1.0.0"
 
 replicaCount: 1
 
