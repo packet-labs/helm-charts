@@ -40,9 +40,7 @@ spec:
           - "--cloud-provider=packet"
           - "--leader-elect=false"
           - "--allow-untagged-cloud=true"
-{{ if eq .Values.ccmPacketRelease "v1.0.0" }}
-          - "--authentication-skip-lookup=true"
-{{ end }}
+{{ if eq .Values.ccmPacketRelease "v0.4.0" }}
         resources:
           requests:
             cpu: 100m
@@ -58,3 +56,19 @@ spec:
               secretKeyRef:
                 name: packet-cloud-config
                 key: projectID
+{{ else }}
+          - "--authentication-skip-lookup=true"
+          - "--provider-config=/etc/cloud-sa/cloud-sa.json"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        volumeMounts:
+          - name: cloud-sa-volume
+            readOnly: true
+            mountPath: "/etc/cloud-sa"
+      volumes:
+        - name: cloud-sa-volume
+          secret:
+            secretName: packet-cloud-config
+{{ end }}
