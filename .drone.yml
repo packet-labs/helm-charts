@@ -1,0 +1,45 @@
+kind: pipeline
+name: default
+
+steps:
+
+- name: Deploy Test Cluster/Apply Select Charts
+  image: ubuntu:bionic
+  environment:
+    PACKET_TOKEN:
+      from_secret: auth_token
+    TF_VAR_auth_token:
+      from_secret: auth_token
+    TF_VAR_project_id:
+      from_secret: project_id
+  commands:
+  - apt update; apt install -y curl openssh-client jq unzip rsync
+  - ssh-keygen -t rsa -b 4096 -C "jmarhee+drone@packet.com" -f drone-key-$DRONE_COMMIT -P ""
+  - PACKET_TOKEN=$PACKET_TOKEN KEY_NAME="$DRONE_COMMIT" PUB_KEY="$(cat drone-key-$DRONE_COMMIT.pub)" sh example/scripts/test_functions-add.sh
+  - export TF_VAR_ssh_private_key_path=drone-key-$DRONE_COMMIT
+  - export TF_VAR_cluster_name=helm-charts-$DRONE_COMMIT
+  - curl --silent --output terraform.zip "https://releases.hashicorp.com/terraform/0.12.2/terraform_0.12.2_linux_amd64.zip"
+  - unzip terraform.zip ; rm -f terraform.zip; chmod +x terraform
+  - mkdir -p ${HOME}/bin ; export PATH=${PATH}:${HOME}/bin; mv terraform ${HOME}/bin/
+  - cd example/
+  - terraform -v
+  - terraform init 
+  - terraform validate
+  - if terraform apply -auto-approve; then echo "Terraform Applied"; else echo "Failed." ; terraform destroy -auto-approve; fi
+  - /usr/bin/ssh -i ../drone-key-$DRONE_COMMIT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q root@$(echo `cat cluster_ip`) "while true; do if [ ! -f /etc/kubernetes/admin.conf ]; then sleep 10; else break; fi; done"
+  - echo "Cluster initialized, completing setup..." ; sleep 240
+  - /usr/bin/rsync -ravz -e "/usr/bin/ssh -i ../drone-key-$DRONE_COMMIT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q" ../packet-ccm root@$(echo `cat cluster_ip`):/root/charts
+  - /usr/bin/ssh -i ../drone-key-$DRONE_COMMIT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q root@$(echo `cat cluster_ip`) "export KUBECONFIG=/etc/kubernetes/admin.conf ; /usr/local/bin/helm install --generate-name ./charts/packet-ccm"
+  - /usr/bin/rsync -ravz -e "/usr/bin/ssh -i ../drone-key-$DRONE_COMMIT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q" ../csi-packet root@$(echo `cat cluster_ip`):/root/charts
+  - /usr/bin/ssh -i ../drone-key-$DRONE_COMMIT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q root@$(echo `cat cluster_ip`) "export KUBECONFIG=/etc/kubernetes/admin.conf ; /usr/local/bin/helm install --generate-name ./charts/csi-packet"
+  - terraform destroy -auto-approve
+
+- name: Clean Up
+  image: python
+  environment:
+    PACKET_TOKEN:
+      from_secret: TF_VAR_auth_token
+  commands:
+  - pip install requests
+  - export KEY_TAG=$DRONE_COMMIT
+  - PACKET_TOKEN=$PACKET_TOKEN KEY_TAG=$KEY_TAG python example/scripts/test_functions-delete.py
