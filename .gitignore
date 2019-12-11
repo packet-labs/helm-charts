@@ -1,0 +1,8 @@
+example/terraform.tfvars
+example/.terraform
+example/*.tfstate
+example/*.tfstate.backup
+example/cluster_ip
+example/get_helm.sh
+exanple/admin.conf
+Secret.yaml
