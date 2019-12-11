@@ -1,5 +1,7 @@
 # Helm Charts for Packet
 
+[![Build Status](https://cloud.drone.io/api/badges/packet-labs/helm-charts/status.svg)](https://cloud.drone.io/packet-labs/helm-charts)
+
 Helm Charts for the Packet ecosystem.
 
 Each chart will be in the relevant subdirectory. From the project root, you can install the desired Helm chart, identified by subdirectory name (i.e. `csi-packet`), for example, using:
