@@ -33,3 +33,13 @@ steps:
   - /usr/bin/rsync -ravz -e "/usr/bin/ssh -i ../drone-key-$DRONE_COMMIT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q" ../csi-packet root@$(echo `cat cluster_ip`):/root/charts
   - /usr/bin/ssh -i ../drone-key-$DRONE_COMMIT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q root@$(echo `cat cluster_ip`) "export KUBECONFIG=/etc/kubernetes/admin.conf ; /usr/local/bin/helm install --generate-name ./charts/csi-packet"
   - terraform destroy -auto-approve
+
+- name: Clean Up
+  image: python:3.6.9
+  environment:
+    PACKET_TOKEN:
+      from_secret: auth_token
+  commands:
+  - pip install requests
+  - KEY_TAG=$DRONE_COMMIT PACKET_TOKEN=$PACKET_TOKEN python example/scripts/test_functions-delete.py
+
