@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-csiPacketRelease: "v1.0.0"
+csiPacketRelease: "v1.1.0"
 
 replicaCount: 1
 
