@@ -48,7 +48,7 @@ helm install --debug ./csi-packet
 
 ### packet-ccm
 
-This configures the [Cloud Controller Manager implementation for Packet](https://github.com/packethost/ccm-packet). To install run:
+This configures the [Cloud Controller Manager implementation for Packet](https://github.com/packethost/packet-ccm). To install run:
 
 ```
 helm install --debug ./packet-ccm
