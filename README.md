@@ -1,6 +1,6 @@
 # Helm Charts for Packet
 
-[![Build Status](https://cloud.drone.io/api/badges/packet-labs/helm-charts/status.svg)](https://cloud.drone.io/packet-labs/helm-charts)
+[![Build Status](https://cloud.drone.io/api/badges/packet-labs/helm-charts/status.svg)](https://cloud.drone.io/packet-labs/helm-charts) ![](https://img.shields.io/badge/Stability-Experimental-red.svg)
 
 Helm Charts for the Packet ecosystem.
 
@@ -11,6 +11,8 @@ helm install --debug --generate-name ./chart-name
 ```
 
 Some may require a `Secret` object in order to authenticate with Packet's APIs.
+
+This repository is [Experimental](https://github.com/packethost/standards/blob/master/experimental-statement.md) meaning that it's based on untested ideas or techniques and not yet established or finalized or involves a radically new and innovative style! This means that support is best effort (at best!) and we strongly encourage you to NOT use this in production.
 
 ## Setup
 
